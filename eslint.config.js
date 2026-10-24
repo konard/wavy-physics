@@ -36,6 +36,7 @@ export default [
         AbortSignal: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
+        performance: 'readonly',
         // Runtime-specific globals
         Bun: 'readonly',
         Deno: 'readonly',
@@ -100,6 +101,14 @@ export default [
       globals: {
         document: 'readonly',
         window: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
+        ResizeObserver: 'readonly',
+        Worker: 'readonly',
+        self: 'readonly',
+        performance: 'readonly',
+        devicePixelRatio: 'readonly',
+        URL: 'readonly',
       },
     },
   },

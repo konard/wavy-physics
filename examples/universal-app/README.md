@@ -1,10 +1,29 @@
-# Universal Example App
+# Wavy Physics app
 
-This example turns the package functions in `src/index.js` into a React UI and
-uses the same build output for GitHub Pages, Electron desktop packages, and
-Capacitor mobile projects.
+This app turns the wave simulations in `src/index.js` into an interactive
+React site. The same build output serves GitHub Pages, Electron desktop
+packages and Capacitor mobile projects. Its tabs are:
 
-![Universal example app preview](../../docs/screenshots/example-app/example-app.png)
+- **Atom**: a hydrogen atom waving in time, as an exact superposition of
+  standing electron waves. Its charge cloud sloshes at the transition
+  frequency.
+- **Orbit**: a Rydberg electron wave packet that circles the nucleus at the
+  Kepler period, spreads, and revives.
+- **Light**: Maxwell's equations (FDTD) radiating from an oscillating dipole,
+  and the Liénard–Wiechert field of an accelerated charge.
+- **Matter**: one-dimensional matter waves (free spreading, tunnelling,
+  oscillator, Dirac Zitterbewegung, NLS solitons).
+- **Fractal**: Fourier synthesis, the Gibbs overshoot and the Weierstrass
+  wave-of-waves.
+- **Validation**: every benchmark against measured or exact results, run in a
+  Web Worker.
+- **Hypothesis**: what the "everything is a wave" claim gets right, where it
+  needs care, and what remains open.
+
+All physics runs in the browser. The simulations are imported from the library
+in `src/physics.js`.
+
+![Wavy Physics app preview](../../docs/screenshots/example-app/example-app.png)
 
 > The preview image above is regenerated automatically on every push to `main`
 > by the `preview-regen` job in `.github/workflows/example-app.yml`. Run it
@@ -38,7 +57,7 @@ npm run example:desktop:make
 `desktop:package` creates a local Electron package under
 `examples/universal-app/out`. `desktop:make` creates distributable artifacts
 for the current platform. The GitHub Pages UI links to the latest GitHub
-release so users can download desktop packages once release artifacts are
+release, where the desktop packages are attached when release artifacts are
 published.
 
 ## Mobile

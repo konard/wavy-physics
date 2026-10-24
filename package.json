@@ -1,12 +1,12 @@
 {
-  "name": "@link-foundation/example-package-name",
+  "name": "wavy-physics",
   "version": "0.11.31",
-  "description": "A JavaScript/TypeScript package template for AI-driven development",
+  "description": "Everything is a wave: a validated wave-only physics library (Schrödinger, Dirac, Maxwell, solitons, fractal waves) with an interactive simulator",
   "type": "module",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "bin": {
-    "example-package-name": "./bin/example-package-name.js"
+    "wavy-physics": "./bin/wavy-physics.js"
   },
   "files": [
     "bin/",
@@ -41,13 +41,22 @@
     "changeset": "changeset",
     "changeset:version": "node scripts/changeset-version.mjs",
     "changeset:publish": "changeset publish",
-    "changeset:status": "changeset status --since=origin/main"
+    "changeset:status": "changeset status --since=origin/main",
+    "validate": "node bin/wavy-physics.js validate"
   },
   "keywords": [
-    "template",
-    "javascript",
-    "typescript",
-    "ai-driven"
+    "physics",
+    "wave",
+    "quantum",
+    "schrodinger",
+    "dirac",
+    "maxwell",
+    "fdtd",
+    "hydrogen",
+    "wave-packet",
+    "soliton",
+    "fractal",
+    "simulation"
   ],
   "author": "",
   "license": "Unlicense",
@@ -61,7 +70,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/link-foundation/js-ai-driven-development-pipeline-template.git"
+    "url": "git+https://github.com/konard/wavy-physics.git"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -87,5 +96,6 @@
       "prettier --write",
       "prettier --check"
     ]
-  }
+  },
+  "homepage": "https://konard.github.io/wavy-physics/"
 }

@@ -24,3 +24,8 @@ https://medium\.com
 
 # Web Archive returns 502 to link checkers (bot protection)
 https://web\.archive\.org
+
+# The project site: example-app.yml deploys it from main after an admin sets
+# Settings -> Pages -> Source = GitHub Actions. Until then the Example app
+# workflow on main fails with that instruction, so the link is not checked.
+https://konard\.github\.io/wavy-physics
