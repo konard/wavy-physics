@@ -69,11 +69,45 @@ jobs:
         with:
           persist-credentials: false
 
+      # The review action needs the repository's dependency graph, which only
+      # an admin can enable. Skip with a warning here; the dependency-graph
+      # job below keeps main red with the same instructions.
+      - name: Check that the dependency graph is enabled
+        id: graph
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: bash scripts/check-dependency-graph.sh warn
+
       - name: Review dependency changes
+        if: steps.graph.outputs.enabled == 'true'
         uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: high
           comment-summary-in-pr: on-failure
+
+  dependency-graph:
+    name: Dependency graph enabled
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    concurrency:
+      group: check-${{ github.workflow }}-${{ github.ref }}-dependency-graph
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Require the dependency graph
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.sha }}
+          HEAD_SHA: ${{ github.sha }}
+        run: bash scripts/check-dependency-graph.sh require
 
   npm-audit:
     name: Audit npm lock (${{ matrix.directory }})
@@ -118,6 +152,7 @@ jobs:
     needs:
       - codeql
       - dependency-review
+      - dependency-graph
       - npm-audit
     steps:
       - uses: actions/checkout@v6
