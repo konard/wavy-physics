@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
  * Regenerate the example-app preview screenshots that ship with this
- * template (issue #62). Drives the built static bundle through a Chromium
+ * repository. Drives the built static bundle through a Chromium
  * controlled by `browser-commander` so the README/site images always reflect
- * the current UI rather than a hand-captured snapshot.
+ * the current UI.
  *
  * Outputs:
  *   - docs/screenshots/example-app/example-app-{en,ru}-{light,dark}.png
@@ -14,11 +14,8 @@
  *   PREVIEW_VERBOSE=1 node scripts/update-preview-images.mjs
  *   node scripts/update-preview-images.mjs --skip-build   # reuse existing dist
  *
- * Pattern reused from konard/vk-bot-desktop#52 (closes konard/vk-bot-desktop#51).
- * The matrix is sized to demonstrate locale × theme variation even when the
- * shipped example app does not yet have i18n or a theme toggle: downstream
- * forks that add either get fresh per-cell screenshots without touching this
- * script. Verbose mode (`PREVIEW_VERBOSE=1`) enables browser-commander
+ * The matrix covers locale × theme so every combination the app supports
+ * gets a fresh screenshot without touching this script. Verbose mode (`PREVIEW_VERBOSE=1`) enables browser-commander
  * tracing, dumps PNG signatures, and prints the resolved <html data-theme>
  * and <html lang> so any future regression is diagnosable from CI logs alone.
  */
@@ -255,7 +252,7 @@ async function captureTile({ browser, locale, theme, contextLocale, url }) {
 
     await commander.waitForSelector({ selector: '.app-shell', timeout: 10000 });
     await commander.waitForSelector({
-      selector: '#calculator-title',
+      selector: '#app-title',
       timeout: 10000,
     });
     await page.waitForLoadState('networkidle');

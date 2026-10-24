@@ -157,6 +157,18 @@ describe('an atom waving in time', () => {
     ).toBeLessThan(1e-6);
   });
 
+  it('shows the phase of a stationary wave rotating at its energy', () => {
+    const ground = new HydrogenSuperposition([{ n: 1, l: 0, m: 0 }], FIXED);
+    const sampler = ground.createPlaneSampler({ extent: 4, resolution: 8 });
+    const centre = 3 * 8 + 3;
+    const start = sampler.realPart(0)[centre];
+    // ψ(t) = ψ(0) e^{−iEt} with E = −½: Re ψ flips sign after t = π/|E|.
+    const half = sampler.realPart(2 * Math.PI)[centre];
+    expect(Math.abs(half + start)).toBeLessThan(1e-6);
+    expect(Math.abs(sampler.realPart(Math.PI)[centre])).toBeLessThan(1e-6);
+    expect(sampler.density(1)[centre]).toBeGreaterThan(0);
+  });
+
   it('builds a Rydberg packet that orbits like a classical electron', () => {
     const packet = circularWavePacket({ nMean: 30, width: 1, count: 5 });
     const [x0, y0] = packet.expectationPosition(0);

@@ -1,8 +1,8 @@
 {
-  "name": "universal-example-app",
+  "name": "wavy-physics-app",
   "version": "0.1.0",
   "private": true,
-  "description": "Universal React example for the JavaScript template package",
+  "description": "Interactive wave-physics simulations (atom, electron packets, light) built on the wavy-physics library",
   "type": "module",
   "main": "electron/main.cjs",
   "allowScripts": {
@@ -42,8 +42,8 @@
     "vite": "^6.4.1"
   },
   "build": {
-    "appId": "foundation.link.template.example",
-    "productName": "Universal Example App",
+    "appId": "io.github.konard.wavyphysics",
+    "productName": "Wavy Physics",
     "asar": true,
     "directories": {
       "output": "out"
@@ -59,7 +59,7 @@
         "deb",
         "rpm"
       ],
-      "maintainer": "Template Maintainers"
+      "maintainer": "Wavy Physics Maintainers"
     },
     "mac": {
       "target": "zip"

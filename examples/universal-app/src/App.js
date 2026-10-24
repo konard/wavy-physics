@@ -1,140 +1,138 @@
-import { createElement as h, useMemo, useState } from 'react';
-import { add, multiply } from '../../../src/index.js';
+import { createElement as h, useEffect, useState } from 'react';
+import { AtomTab } from './tabs/AtomTab.js';
+import { FractalTab } from './tabs/FractalTab.js';
+import { HypothesisTab } from './tabs/HypothesisTab.js';
+import { LightTab } from './tabs/LightTab.js';
+import { MatterTab } from './tabs/MatterTab.js';
+import { OrbitTab } from './tabs/OrbitTab.js';
+import { ValidationTab } from './tabs/ValidationTab.js';
 
 const repositoryUrl =
   import.meta.env.VITE_REPOSITORY_URL ??
-  'https://github.com/link-foundation/js-ai-driven-development-pipeline-template';
+  'https://github.com/konard/wavy-physics';
 
-const desktopTargets = [
-  {
-    label: 'Windows',
-    detail: 'Installer or portable package from the latest desktop build.',
-  },
-  {
-    label: 'macOS',
-    detail: 'Signed archive when Apple credentials are configured.',
-  },
-  {
-    label: 'Linux',
-    detail: 'Zip, deb, or rpm output from Electron Forge.',
-  },
+export const TABS = [
+  { id: 'atom', label: 'Atom', component: AtomTab },
+  { id: 'orbit', label: 'Electron packet', component: OrbitTab },
+  { id: 'light', label: 'Light', component: LightTab },
+  { id: 'matter', label: 'Matter waves', component: MatterTab },
+  { id: 'fractal', label: 'Waves of waves', component: FractalTab },
+  { id: 'validation', label: 'Validation', component: ValidationTab },
+  { id: 'hypothesis', label: 'Hypothesis', component: HypothesisTab },
 ];
 
-function parseInput(value) {
-  const number = Number(value);
-  return Number.isFinite(number) ? number : 0;
+function tabFromHash() {
+  const id = window.location.hash.replace('#', '');
+  return TABS.some((tab) => tab.id === id) ? id : TABS[0].id;
 }
 
-function NumberField({ id, label, value, onChange }) {
+function initialTheme() {
+  const stored = window.localStorage?.getItem('theme');
+  if (stored === 'light' || stored === 'dark') {
+    return stored;
+  }
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
+}
+
+/**
+ * The theme attribute is set before React re-renders, because canvases read
+ * their colours from CSS variables while drawing (children draw first).
+ */
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  return theme;
+}
+
+function useTheme() {
+  const [theme, setTheme] = useState(() => applyTheme(initialTheme()));
+  const toggle = () => {
+    const next = applyTheme(theme === 'dark' ? 'light' : 'dark');
+    window.localStorage?.setItem('theme', next);
+    setTheme(next);
+  };
+  return [theme, toggle];
+}
+
+function useActiveTab() {
+  const [active, setActive] = useState(tabFromHash);
+  useEffect(() => {
+    const onHashChange = () => setActive(tabFromHash());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+  return active;
+}
+
+function TabBar({ active }) {
   return h(
-    'label',
-    { className: 'number-field', htmlFor: id },
-    h('span', null, label),
-    h('input', {
-      id,
-      inputMode: 'decimal',
-      type: 'number',
-      value,
-      onChange: (event) => onChange(event.target.value),
-    })
+    'nav',
+    { className: 'tab-bar', 'aria-label': 'Simulations' },
+    TABS.map((tab) =>
+      h(
+        'a',
+        {
+          key: tab.id,
+          href: `#${tab.id}`,
+          className: tab.id === active ? 'tab tab-active' : 'tab',
+          'aria-current': tab.id === active ? 'page' : undefined,
+        },
+        tab.label
+      )
+    )
   );
-}
-
-function ResultTile({ label, value, tone }) {
-  return h(
-    'div',
-    { className: `result-tile result-tile-${tone}` },
-    h('span', { className: 'result-label' }, label),
-    h('strong', null, String(value))
-  );
-}
-
-function DownloadTarget({ label, detail }) {
-  return h('li', null, h('span', null, label), h('small', null, detail));
 }
 
 export function App() {
-  const [left, setLeft] = useState('2');
-  const [right, setRight] = useState('3');
-  const parsedLeft = parseInput(left);
-  const parsedRight = parseInput(right);
-  const addition = useMemo(
-    () => add(parsedLeft, parsedRight),
-    [parsedLeft, parsedRight]
-  );
-  const multiplication = useMemo(
-    () => multiply(parsedLeft, parsedRight),
-    [parsedLeft, parsedRight]
-  );
-
+  const [theme, toggleTheme] = useTheme();
+  const active = useActiveTab();
+  const tab = TABS.find((entry) => entry.id === active);
+  const dark = theme === 'dark';
   return h(
-    'main',
+    'div',
     { className: 'app-shell' },
     h(
-      'section',
-      { className: 'workspace', 'aria-labelledby': 'calculator-title' },
+      'header',
+      { className: 'app-header' },
       h(
         'div',
-        { className: 'calculator-panel' },
-        h('p', { className: 'eyebrow' }, 'Package function UI'),
-        h('h1', { id: 'calculator-title' }, 'Universal Example App'),
+        { className: 'brand' },
+        h('h1', { id: 'app-title' }, 'Wavy Physics'),
         h(
-          'div',
-          { className: 'input-grid' },
-          h(NumberField, {
-            id: 'left-number',
-            label: 'First value',
-            value: left,
-            onChange: setLeft,
-          }),
-          h(NumberField, {
-            id: 'right-number',
-            label: 'Second value',
-            value: right,
-            onChange: setRight,
-          })
-        ),
-        h(
-          'div',
-          { className: 'results-grid', 'aria-live': 'polite' },
-          h(ResultTile, {
-            label: 'Addition',
-            value: addition,
-            tone: 'green',
-          }),
-          h(ResultTile, {
-            label: 'Multiplication',
-            value: multiplication,
-            tone: 'blue',
-          })
+          'p',
+          { className: 'tagline' },
+          'Everything as waves: atoms, electrons and light simulated with wave equations only.'
         )
       ),
       h(
-        'aside',
-        { className: 'distribution-panel', 'aria-labelledby': 'desktop-title' },
-        h('h2', { id: 'desktop-title' }, 'Desktop builds'),
-        h(
-          'p',
-          null,
-          'The same React bundle is used by GitHub Pages, Electron, Android, and iOS.'
-        ),
-        h(
-          'ul',
-          { className: 'target-list' },
-          desktopTargets.map((target) =>
-            h(DownloadTarget, { key: target.label, ...target })
-          )
-        ),
-        h(
-          'a',
-          {
-            className: 'download-link',
-            href: `${repositoryUrl}/releases/latest`,
-            target: '_blank',
-            rel: 'noreferrer',
-          },
-          'Open desktop downloads'
-        )
+        'button',
+        {
+          type: 'button',
+          className: 'button theme-toggle',
+          onClick: toggleTheme,
+          'aria-label': `Switch to ${dark ? 'light' : 'dark'} theme`,
+        },
+        dark ? '☀ Light' : '☾ Dark'
+      )
+    ),
+    h(TabBar, { active }),
+    h(
+      'main',
+      { className: 'app-main', id: `panel-${tab.id}` },
+      h(tab.component, { key: tab.id, dark })
+    ),
+    h(
+      'footer',
+      { className: 'app-footer' },
+      h(
+        'p',
+        null,
+        'Built with the ',
+        h('a', { href: repositoryUrl }, 'wavy-physics'),
+        ' JavaScript library (npm install wavy-physics). Atomic units, CODATA 2022 constants. Desktop and mobile builds: ',
+        h('a', { href: `${repositoryUrl}/releases/latest` }, 'latest release'),
+        '.'
       )
     )
   );

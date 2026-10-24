@@ -399,24 +399,30 @@ export class HydrogenSuperposition {
       }
       return { re, im };
     });
+    const combine = (t, out, reduce) => {
+      const coefficients = this.terms.map((_, k) => this.coefficient(k, t));
+      for (let i = 0; i < size; i++) {
+        let re = 0;
+        let im = 0;
+        for (let k = 0; k < basis.length; k++) {
+          const [cr, ci] = coefficients[k];
+          re += cr * basis[k].re[i] - ci * basis[k].im[i];
+          im += cr * basis[k].im[i] + ci * basis[k].re[i];
+        }
+        out[i] = reduce(re, im);
+      }
+      return out;
+    };
     return {
       resolution,
       extent,
       plane,
-      density: (t, out = new Float32Array(size)) => {
-        const coefficients = this.terms.map((_, k) => this.coefficient(k, t));
-        for (let i = 0; i < size; i++) {
-          let re = 0;
-          let im = 0;
-          for (let k = 0; k < basis.length; k++) {
-            const [cr, ci] = coefficients[k];
-            re += cr * basis[k].re[i] - ci * basis[k].im[i];
-            im += cr * basis[k].im[i] + ci * basis[k].re[i];
-          }
-          out[i] = re * re + im * im;
-        }
-        return out;
-      },
+      /** Probability density |ψ|² on the plane at time t. */
+      density: (t, out = new Float32Array(size)) =>
+        combine(t, out, (re, im) => re * re + im * im),
+      /** Re ψ on the plane: the wave itself, including its phase. */
+      realPart: (t, out = new Float32Array(size)) =>
+        combine(t, out, (re) => re),
     };
   }
 }

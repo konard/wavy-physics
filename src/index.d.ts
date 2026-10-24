@@ -282,6 +282,10 @@ export declare class HydrogenSuperposition {
       t: number,
       out?: T
     ): T;
+    realPart<T extends Float32Array | Float64Array = Float32Array>(
+      t: number,
+      out?: T
+    ): T;
   };
 }
 export declare function circularWavePacket(

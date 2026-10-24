@@ -45,14 +45,24 @@ describe('universal React example app', () => {
     expect(packageJson.scripts['mobile:ios:run']).toContain('cap run ios');
   });
 
-  it('renders a visual UI using the package add and multiply functions', () => {
+  it('renders the wave simulations from the library in tabs', () => {
     const appSource = readText(appSourcePath);
+    const physicsSource = readText(`${exampleRoot}/src/physics.js`);
 
-    expect(appSource).toContain("from '../../../src/index.js'");
-    expect(appSource).toContain('add(parsedLeft, parsedRight)');
-    expect(appSource).toContain('multiply(parsedLeft, parsedRight)');
-    expect(appSource).toContain('Addition');
-    expect(appSource).toContain('Multiplication');
+    expect(physicsSource).toContain("from '../../../src/index.js'");
+    expect(appSource).toContain("id: 'app-title'");
+    for (const tab of [
+      'atom',
+      'orbit',
+      'light',
+      'matter',
+      'fractal',
+      'validation',
+      'hypothesis',
+    ]) {
+      expect(appSource).toContain(`id: '${tab}'`);
+      expect(existsSync(`${exampleRoot}/src/tabs`)).toBe(true);
+    }
   });
 
   it('shares the Vite build output with Capacitor and GitHub Pages', () => {
@@ -63,7 +73,7 @@ describe('universal React example app', () => {
     expect(viteConfig).toContain('base: resolveBasePath()');
     expect(viteConfig).toContain("outDir: 'dist'");
     expect(capacitorConfig.webDir).toBe('dist');
-    expect(capacitorConfig.appId).toBe('foundation.link.template.example');
+    expect(capacitorConfig.appId).toBe('io.github.konard.wavyphysics');
   });
 
   it('adds root scripts and a workflow for web, desktop, and mobile checks', () => {
