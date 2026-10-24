@@ -1,123 +1,159 @@
-# js-ai-driven-development-pipeline-template
+# wavy-physics
 
-A comprehensive template for AI-driven JavaScript/TypeScript development with full CI/CD pipeline support.
+**Everything is a wave.** A JavaScript library and an interactive website that
+simulate atoms, electrons and light using wave equations only, and that check
+every result against measured data (NIST, CODATA 2022) or exact solutions.
 
-This repository publishes the real test package
-`@link-foundation/example-package-name` so the template release pipeline is
-validated end to end with npm trusted publishing.
+- **Website:** <https://konard.github.io/wavy-physics/> (works on phones,
+  tablets and desktops, in light and dark themes)
+- **Library:** `npm install wavy-physics` for Node.js, Bun, Deno and browsers
+- **Background:** [case study for issue 1](docs/case-studies/issue-1/README.md)
+
+| An atom waving in time                                    | Light from an accelerating charge                          |
+| --------------------------------------------------------- | ---------------------------------------------------------- |
+| ![Atom tab](docs/screenshots/tabs/atom-desktop-light.png) | ![Light tab](docs/screenshots/tabs/light-desktop-dark.png) |
 
 ## Features
 
-- **Multi-runtime support**: Works with Bun, Node.js, and Deno
-- **Universal testing**: Uses [test-anywhere](https://github.com/link-foundation/test-anywhere) for cross-runtime tests
-- **Automated releases**: Changesets-based versioning with GitHub Actions
-- **Optional Docker Hub publishing**: Docker images can be published after the matching npm version is visible
-- **Universal app example**: React UI for the package API with GitHub Pages, Electron, and Capacitor build paths
-- **Code quality**: ESLint + Prettier with pre-commit hooks via Husky
-- **Package manager agnostic**: Works with bun, npm, yarn, pnpm, and deno
-- **Broken link checks**: Automated link validation with [lychee](https://github.com/lycheeverse/lychee-action) and Web Archive fallback suggestions
+- **The atom as standing waves**: exact hydrogen eigenfunctions (reduced mass,
+  CODATA 2022) and their time-dependent superpositions. A 1s + 2p charge cloud
+  oscillates at the Lyman-α frequency and radiates. Dipole matrix elements,
+  Einstein A coefficients and lifetimes (2p: 1.596 ns) come from wave overlap
+  integrals. Dirac levels give the fine structure.
+- **The electron as a wave packet around the atom**: circular Rydberg packets
+  orbit the proton at the classical Kepler period, spread, and revive.
+- **Light from accelerating charge waves**: Maxwell's equations on a Yee grid
+  (FDTD) with dipole sources and dielectrics, the exact Liénard–Wiechert field
+  of a moving point charge, and Larmor and Liénard power. Semiclassical and
+  quantum (QED) emission rates are compared.
+- **Matter waves**: split-operator Fourier solvers for the Schrödinger equation
+  in 1D and 2D (real and imaginary time), tunnelling, the harmonic oscillator,
+  the radial wave equation, Dirac Zitterbewegung and nonlinear Schrödinger
+  solitons (particle-like waves that survive collisions).
+- **Waves of waves**: Fourier synthesis, the Gibbs overshoot and the
+  Weierstrass fractal wave with its box-counting dimension.
+- **Validation**: 30 benchmarks, run by the test suite on Node.js, Bun and
+  Deno, by `npx wavy-physics validate`, and live on the website.
 
 ## Quick Start
 
-### Using This Template
+```bash
+npm install wavy-physics
+npx wavy-physics validate        # run all 30 benchmarks
+npx wavy-physics spectrum 2 1    # Lyman-α wavelength in nm
+npx wavy-physics lifetime 2 1    # 2p radiative lifetime in s
+```
 
-1. Click "Use this template" on GitHub to create a new repository
-2. Clone your new repository
-3. Update `package.json` with your package name and description
-4. Install dependencies: `bun install`
-5. Start developing!
+```js
+import {
+  HydrogenSuperposition,
+  circularWavePacket,
+  keplerPeriod,
+  runValidation,
+} from 'wavy-physics';
+
+// 1s + 2p₀: an atom whose charge cloud oscillates in time.
+const atom = new HydrogenSuperposition([
+  { n: 1, l: 0, m: 0 },
+  { n: 2, l: 1, m: 0 },
+]);
+atom.expectationPosition(4); // [0, 0, ⟨z⟩(t)] in bohr
+atom.createPlaneSampler({ plane: 'xz', extent: 10 }).density(4); // |ψ|² image
+
+// An electron wave packet orbiting the nucleus.
+const packet = circularWavePacket({ nMean: 30, width: 1, count: 5 });
+packet.expectationPosition(keplerPeriod(30) / 4);
+
+runValidation().every((result) => result.pass); // true
+```
+
+Units are Hartree atomic units (bohr, hartree, ħ = mₑ = e = 1). Conversion
+helpers and the `SI` / `AU` constants are exported. See
+[examples/basic-usage.js](examples/basic-usage.js) for a runnable tour and
+[src/index.d.ts](src/index.d.ts) for the full typed API.
 
 ### Development
 
 ```bash
 # Install dependencies
-bun install
+npm install
 
 # Run tests
-bun test --timeout 30000
-
-# Or with other runtimes:
 npm test
+bun test --timeout 30000
 deno test -A --parallel
 
-# Lint code
-bun run lint
+# Lint, format and duplication checks
+npm run check
 
-# Format code
-bun run format
-
-# Check all (lint + format + file size)
-bun run check
-
-# Build the universal React example app
+# Build and preview the website (also used for desktop and mobile)
 npm install --prefix examples/universal-app
+npm run example:web:dev
 npm run example:web:build
 npm run example:desktop:package
 
 # Try the CLI locally
-node bin/example-package-name.js add 2 3
+node bin/wavy-physics.js validate
 ```
 
 ## Project Structure
 
 ```
 .
-├── .changeset/           # Changeset configuration
-├── .github/workflows/    # GitHub Actions CI/CD
-├── .husky/               # Git hooks (pre-commit)
-├── examples/             # Usage examples
-│   └── universal-app/    # React + GitHub Pages + Electron + Capacitor app
-├── scripts/              # Build and release scripts
-├── src/                  # Source code
-│   ├── index.js          # Main entry point
-│   └── index.d.ts        # TypeScript definitions
-├── tests/                # Test files
-├── .eslintrc.js          # ESLint configuration
-├── .prettierrc           # Prettier configuration
-├── bunfig.toml           # Bun configuration
-├── deno.json             # Deno configuration
-└── package.json          # Node.js package manifest
+├── bin/wavy-physics.js   # CLI (validate, energy, spectrum, lifetime, constants)
+├── docs/case-studies/    # Research notes, including issue 1 (the hypothesis)
+├── docs/screenshots/     # Website screenshots
+├── examples/
+│   ├── basic-usage.js    # Library tour
+│   └── universal-app/    # The website: React + GitHub Pages + Electron + Capacitor
+├── experiments/          # Convergence and performance experiments
+├── scripts/              # Build, release and CI scripts
+├── src/
+│   ├── index.js          # Public API
+│   ├── index.d.ts        # TypeScript definitions
+│   └── physics/          # Wave solvers and the validation suite
+└── tests/                # Physics and tooling tests (test-anywhere)
 ```
 
 ## Design Choices
 
+### Waves only
+
+Every simulation evolves a wave equation (Schrödinger, Dirac, Maxwell,
+nonlinear Schrödinger, the classical string) or evaluates an exact wave
+solution. Particles appear as wave packets or as stable wave configurations
+(solitons); there are no point-particle trajectories in the solvers. The one
+exception is the Liénard–Wiechert field, which is the exact retarded solution
+of Maxwell's equations for a prescribed moving charge. It is used to show how
+acceleration produces light.
+
+### Accuracy
+
+Numerical methods are chosen for known error behaviour: split-operator Fourier
+steps keep the norm exact with second-order time error, imaginary-time
+relaxation finds ground states without analytic input, and FDTD runs at a
+stable Courant number. Each benchmark's tolerance reflects the method's error
+at its grid size, and the reference value cites its source.
+
 ### Multi-Runtime Support
 
-This template is designed to work seamlessly with all major JavaScript runtimes:
-
-- **Bun**: Primary runtime with highest performance, uses native test support (`bun test`)
-- **Node.js**: Alternative runtime, uses built-in test runner (`node --test`)
-- **Deno**: Secure runtime with built-in TypeScript support (`deno test`)
-
-The [test-anywhere](https://github.com/link-foundation/test-anywhere) framework provides a unified testing API that works identically across all runtimes.
-
-### Package Manager Agnostic
-
-While `package.json` is the source of truth for dependencies, the template supports:
-
-- **bun**: Primary choice, uses `bun.lockb`
-- **npm**: Uses `package-lock.json`
-- **yarn**: Uses `yarn.lock`
-- **pnpm**: Uses `pnpm-lock.yaml`
-- **deno**: Uses `deno.json` for configuration
-
-Note: `package-lock.json` is not committed by default to allow any package manager.
+The library has no dependencies and runs on Node.js, Bun, Deno and in
+browsers. The [test-anywhere](https://github.com/link-foundation/test-anywhere)
+framework runs the same tests on every runtime.
 
 ### Universal App Example
 
-The template includes `examples/universal-app`, a Vite React app that imports
-`add` and `multiply` from `src/index.js` and renders a visual calculator UI.
-The same static build is used by:
+`examples/universal-app` is the Wavy Physics website. It is a Vite React app
+that imports the library from `src/index.js`, so every frame on screen comes
+from the tested solvers. The same static build is used by:
 
 - GitHub Pages (`npm run example:web:build`)
 - Electron desktop packaging (`npm run example:desktop:package`)
 - Capacitor Android/iOS sync (`npm run example:mobile:sync`)
 
-The example app has its own `package.json` and lockfile so template users can
-opt into the frontend stack without adding React, Electron, or Capacitor to the
-library package itself.
-
-See [examples/universal-app/README.md](examples/universal-app/README.md) for
+The app has its own `package.json` and lockfile, so the library itself stays
+dependency-free. See
+[examples/universal-app/README.md](examples/universal-app/README.md) for
 local web, desktop, Android, and iOS testing instructions.
 
 ### Code Quality
@@ -247,10 +283,10 @@ npm run example:web:preview-images
 PREVIEW_VERBOSE=1 npm run example:web:preview-images
 ```
 
-The matrix defaults to `{en, ru} × {light, dark}`. The shipped example app
-has no localization or theme toggle yet, so every cell currently renders
-the same UI — when a fork adds either, the matrix produces real per-cell
-variants without script edits.
+The matrix defaults to `{en, ru} × {light, dark}`. The website reads the
+`theme` key from localStorage (falling back to the system colour scheme), so
+the light and dark cells show both themes; the interface is English, so the
+locale cells match.
 
 ### Broken Link Checker
 
@@ -268,12 +304,11 @@ Add regex patterns to `.lycheeignore` to exclude URLs from checks (e.g., local d
 
 ## Configuration
 
-### Updating Package Name
+### Package Name
 
-After creating a repository from this template, update the package name in:
-
-1. `package.json`: replace `"@link-foundation/example-package-name"` with your package name
-2. `.changeset/config.json`: Package references
+The package is published as `wavy-physics`. The name is read from
+`package.json`; `.changeset/config.json` holds the changeset package
+references.
 
 Release scripts derive the package name from `package.json` at runtime, so no
 script-level package-name constants need to be edited during template adoption.
