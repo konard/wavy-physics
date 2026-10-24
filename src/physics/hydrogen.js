@@ -238,8 +238,8 @@ export function radiativeLifetime(n, l, options) {
 
 /**
  * Vacuum wavelength (metres) of the n_upper → n_lower line.
- * @param {number} upper
- * @param {number} lower
+ * @param {number} upper - Upper principal quantum number.
+ * @param {number} lower - Lower principal quantum number.
  * @param {{Z?: number, nucleusMass?: number, jUpper?: number,
  *   jLower?: number}} [options] - Supply j values to use Dirac energies.
  */

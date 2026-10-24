@@ -1,35 +1,74 @@
 /**
- * Example test file using test-anywhere
- * Works with Node.js, Bun, and Deno
+ * Public API surface of wavy-physics (works with Node.js, Bun, and Deno).
  */
 
 import { describe, it, expect } from 'test-anywhere';
-import { add, multiply } from '../src/index.js';
+import * as wavy from '../src/index.js';
 
-describe('add function', () => {
-  it('should add two positive numbers', () => {
-    expect(add(2, 3)).toBe(5);
+const FUNCTIONS = [
+  'reducedMass',
+  'hartreeToEV',
+  'photonWavelength',
+  'fftWavenumbers',
+  'gaussLegendre',
+  'sphericalHarmonic',
+  'hydrogenEnergy',
+  'diracEnergy',
+  'hydrogenWavefunction',
+  'dipoleMatrixElement',
+  'einsteinA',
+  'radiativeLifetime',
+  'transitionWavelength',
+  'circularWavePacket',
+  'keplerPeriod',
+  'solveRadialStates',
+  'barrierTransmission',
+  'packetTransmission',
+  'dominantFrequency',
+  'brightSoliton',
+  'larmorPower',
+  'lienardPower',
+  'lienardWiechertField',
+  'poyntingFlux',
+  'sampleFieldPlane',
+  'twoLevelEmission',
+  'dAlembert',
+  'weierstrass',
+  'boxCountingDimension',
+  'runBenchmark',
+  'runValidation',
+];
+
+const CLASSES = [
+  'FFT',
+  'FFT2D',
+  'Schrodinger1D',
+  'Schrodinger2D',
+  'HydrogenSuperposition',
+  'Dirac1D',
+  'NonlinearSchrodinger1D',
+  'FDTD1D',
+  'FDTD2D',
+  'StringWave',
+];
+
+describe('wavy-physics entry point', () => {
+  it('exports every wave solver and helper', () => {
+    for (const name of [...FUNCTIONS, ...CLASSES]) {
+      expect(typeof wavy[name]).toBe('function');
+    }
   });
 
-  it('should add negative numbers', () => {
-    expect(add(-1, -2)).toBe(-3);
+  it('exports CODATA 2022 constants in SI and atomic units', () => {
+    expect(wavy.SI.c).toBe(299792458);
+    expect(wavy.SI.alpha).toBe(7.2973525643e-3);
+    expect(wavy.AU.c).toBe(1 / wavy.SI.alpha);
+    expect(Object.isFrozen(wavy.SI)).toBe(true);
   });
 
-  it('should add zero', () => {
-    expect(add(5, 0)).toBe(5);
-  });
-});
-
-describe('multiply function', () => {
-  it('should multiply two positive numbers', () => {
-    expect(multiply(2, 3)).toBe(6);
-  });
-
-  it('should multiply by zero', () => {
-    expect(multiply(5, 0)).toBe(0);
-  });
-
-  it('should multiply negative numbers', () => {
-    expect(multiply(-2, 3)).toBe(-6);
+  it('exports a benchmark catalogue with unique ids', () => {
+    const ids = wavy.BENCHMARKS.map((entry) => entry.id);
+    expect(ids.length).toBeGreaterThanOrEqual(30);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });

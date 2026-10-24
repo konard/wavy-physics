@@ -9,6 +9,7 @@ const SCRIPT = 'scripts/preflight-credentials.sh';
 // PATH entries are directories, so the stub lives at
 // tests/fixtures/preflight-stub/curl and the directory goes on PATH.
 const STUB_DIR = 'tests/fixtures/preflight-stub';
+const PACKAGE_NAME = JSON.parse(readFileSync('package.json', 'utf8')).name;
 const WORKFLOW = readFileSync(
   '.github/workflows/release.yml',
   'utf8'
@@ -173,7 +174,7 @@ describe('release-preflight probe behaviour (offline, curl stub)', () => {
         'audience=npm%3Aregistry.npmjs.org'
       );
       expect(readFileSync(join(fixtures, 'requests'), 'utf8')).toContain(
-        '/exchange/package/%40link-foundation%2Fexample-package-name'
+        `/exchange/package/${encodeURIComponent(PACKAGE_NAME)}`
       );
       expect(stdout).not.toContain('private-fixture');
     }
